@@ -195,11 +195,11 @@ function FormBuilder({ onComplete }) {
     <div style={{maxHeight:"58vh",overflowY:"auto",paddingRight:4}}>
       <SectionLabel color={T.blue}>Personal Information</SectionLabel>
       <div style={{...half,marginBottom:10}}>
-        {[["name","Full Name","Anuj Chaudhary"],["email","Email","anuj@email.com"],["phone","Phone","+91 76687 96070"],["location","Location","Mathura, UP"]].map(([k,l,p])=>(
+        {[["name","Full Name","PETER PARKER"],["email","Email","XXX@email.com"],["phone","Phone","+91 XXXXXXXXXX"],["location","Location","CITY, STATE"]].map(([k,l,p])=>(
           <div key={k} style={{marginBottom:8}}><label style={lbl}>{l}</label><input style={fld} value={form[k]} onChange={e=>upd(k,e.target.value)} placeholder={p} onFocus={e=>e.target.style.borderColor=T.blue} onBlur={e=>e.target.style.borderColor=T.border}/></div>
         ))}
       </div>
-      <div style={{marginBottom:12}}><label style={lbl}>LinkedIn</label><input style={fld} value={form.linkedin} onChange={e=>upd("linkedin",e.target.value)} placeholder="linkedin.com/in/anuj-chaudhary" onFocus={e=>e.target.style.borderColor=T.blue} onBlur={e=>e.target.style.borderColor=T.border}/></div>
+      <div style={{marginBottom:12}}><label style={lbl}>LinkedIn</label><input style={fld} value={form.linkedin} onChange={e=>upd("linkedin",e.target.value)} placeholder="linkedin.com/in/PETER-PARKER" onFocus={e=>e.target.style.borderColor=T.blue} onBlur={e=>e.target.style.borderColor=T.border}/></div>
       <div style={{marginBottom:16}}><label style={lbl}>Career Summary</label><textarea style={{...fld,minHeight:60,resize:"vertical"}} value={form.summary} onChange={e=>upd("summary",e.target.value)} placeholder="Brief summary — AI will enhance it…"/></div>
  
       <SectionLabel color={T.gold}>Experience</SectionLabel>
@@ -211,9 +211,9 @@ function FormBuilder({ onComplete }) {
           </div>
           <div style={{...half,marginBottom:8}}>
             <div><label style={lbl}>Job Title</label><input style={fld} value={exp.title} onChange={e=>upd(`experience.${ei}.title`,e.target.value)} placeholder="Python Intern" onFocus={e=>e.target.style.borderColor=T.gold} onBlur={e=>e.target.style.borderColor=T.border}/></div>
-            <div><label style={lbl}>Company</label><input style={fld} value={exp.company} onChange={e=>upd(`experience.${ei}.company`,e.target.value)} placeholder="Acmegrade" onFocus={e=>e.target.style.borderColor=T.gold} onBlur={e=>e.target.style.borderColor=T.border}/></div>
+            <div><label style={lbl}>Company</label><input style={fld} value={exp.company} onChange={e=>upd(`experience.${ei}.company`,e.target.value)} placeholder="Organization" onFocus={e=>e.target.style.borderColor=T.gold} onBlur={e=>e.target.style.borderColor=T.border}/></div>
           </div>
-          <div style={{marginBottom:10}}><label style={lbl}>Duration</label><input style={fld} value={exp.dates} onChange={e=>upd(`experience.${ei}.dates`,e.target.value)} placeholder="Jun 2023 – Dec 2023" onFocus={e=>e.target.style.borderColor=T.gold} onBlur={e=>e.target.style.borderColor=T.border}/></div>
+          <div style={{marginBottom:10}}><label style={lbl}>Duration</label><input style={fld} value={exp.dates} onChange={e=>upd(`experience.${ei}.dates`,e.target.value)} placeholder="MM YYYY – MM YYYY" onFocus={e=>e.target.style.borderColor=T.gold} onBlur={e=>e.target.style.borderColor=T.border}/></div>
           <label style={lbl}>Responsibilities</label>
           {exp.bullets.map((b,bi)=>(
             <div key={bi} style={{display:"flex",gap:6,marginBottom:5}}>
@@ -231,7 +231,7 @@ function FormBuilder({ onComplete }) {
         <div key={i} style={{...half,background:"rgba(255,255,255,0.02)",border:`1px solid ${T.border}`,borderRadius:10,padding:"12px",marginBottom:8}}>
           <div><label style={lbl}>Degree</label><input style={fld} value={ed.degree} onChange={e=>upd(`education.${i}.degree`,e.target.value)} placeholder="B.Tech CSE"/></div>
           <div><label style={lbl}>Institution</label><input style={fld} value={ed.school} onChange={e=>upd(`education.${i}.school`,e.target.value)} placeholder="University Name"/></div>
-          <div style={{gridColumn:"span 2"}}><label style={lbl}>Year</label><input style={fld} value={ed.year} onChange={e=>upd(`education.${i}.year`,e.target.value)} placeholder="2025 / Pursuing"/></div>
+          <div style={{gridColumn:"span 2"}}><label style={lbl}>Year</label><input style={fld} value={ed.year} onChange={e=>upd(`education.${i}.year`,e.target.value)} placeholder="XXXX / Pursuing / Complete"/></div>
         </div>
       ))}
       <button onClick={addEdu} style={{width:"100%",background:"none",border:`1px dashed ${T.border}`,color:T.teal,cursor:"pointer",fontSize:9,fontFamily:T.ff.mono,padding:"8px",borderRadius:8,marginBottom:16,letterSpacing:1}}>+ ADD EDUCATION</button>
@@ -501,7 +501,7 @@ RULES: Every bullet starts with a strong past-tense action verb. Add quantified 
                 <>
                   <div style={{fontFamily:T.ff.mono,fontSize:9,color:T.textMuted,letterSpacing:1.5,marginBottom:8}}>RESUME TEXT</div>
                   <textarea style={{...ta,minHeight:260,color:T.textSub}} value={resumeText} onChange={e=>setResumeText(e.target.value)}
-                    placeholder={"Paste your full resume here…\n\nAnuj Chaudhary\nanujattri59@gmail.com | 7668796070 | Mathura, UP\n\nSKILLS\nPython, SQL, Anaconda, VS Code\n\nINTERNSHIP\nPython Intern – Acmegrade\n- Learned Python with Jupyter Notebook\n- Managed packages with Anaconda\n\nEDUCATION\nB.Sc. — XYZ University | 2024"}
+                    placeholder={"Paste your full resume here…\n\nPETER PARKER\nXXX@gmail.com | XXXXXXXXXX | CITY, STATE\n\nSKILLS\nPython, SQL, Anaconda, VS Code\n\nINTERNSHIP\nTitle – Organization\n- Learned Python with Jupyter Notebook\n- Managed packages with Anaconda\n\nEDUCATION\nB.Sc. — XXX University | YYYY"}
                     onFocus={e=>e.target.style.borderColor=T.teal} onBlur={e=>e.target.style.borderColor=T.border}/>
                   {resumeText.trim()&&<div style={{fontFamily:T.ff.mono,fontSize:9,color:T.textMuted,marginTop:6,letterSpacing:1}}>{resumeText.trim().split(/\s+/).length} WORDS</div>}
                 </>

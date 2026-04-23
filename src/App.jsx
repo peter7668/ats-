@@ -158,10 +158,10 @@ function FormBuilder({ onComplete }) {
     <div style={{maxHeight:"62vh",overflowY:"auto",paddingRight:6}}>
       <div style={{fontSize:10,color:P.accent,fontFamily:"monospace",letterSpacing:1,marginBottom:12,fontWeight:700}}>● PERSONAL INFORMATION</div>
       <div style={{...half,marginBottom:10}}>
-        <div><label style={lbl}>Full Name *</label><input style={fld} value={form.name} onChange={e=>upd("name",e.target.value)} placeholder="Anuj Chaudhary"/></div>
-        <div><label style={lbl}>Email *</label><input style={fld} value={form.email} onChange={e=>upd("email",e.target.value)} placeholder="anujattri59@gmail.com"/></div>
-        <div><label style={lbl}>Phone</label><input style={fld} value={form.phone} onChange={e=>upd("phone",e.target.value)} placeholder="+91 76687 96070"/></div>
-        <div><label style={lbl}>Location</label><input style={fld} value={form.location} onChange={e=>upd("location",e.target.value)} placeholder="Mathura, UP, India"/></div>
+        <div><label style={lbl}>Full Name *</label><input style={fld} value={form.name} onChange={e=>upd("name",e.target.value)} placeholder="PETER PARKER"/></div>
+        <div><label style={lbl}>Email *</label><input style={fld} value={form.email} onChange={e=>upd("email",e.target.value)} placeholder="peter@XXX.com"/></div>
+        <div><label style={lbl}>Phone</label><input style={fld} value={form.phone} onChange={e=>upd("phone",e.target.value)} placeholder="+91 XXXXXXXXXX"/></div>
+        <div><label style={lbl}>Location</label><input style={fld} value={form.location} onChange={e=>upd("location",e.target.value)} placeholder="City, State , Country"/></div>
       </div>
       <div style={{marginBottom:10}}><label style={lbl}>LinkedIn URL</label><input style={fld} value={form.linkedin} onChange={e=>upd("linkedin",e.target.value)} placeholder="linkedin.com/in/anuj-chaudhary"/></div>
       <div style={{marginBottom:14}}><label style={lbl}>Career Summary (optional)</label><textarea style={{...fld,minHeight:60,resize:"vertical"}} value={form.summary} onChange={e=>upd("summary",e.target.value)} placeholder="Brief summary — AI will improve it…"/></div>

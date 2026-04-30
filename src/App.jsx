@@ -65,20 +65,23 @@ const AGENTS = [
 /* ── Helpers ── */
 function tryJSON(t,f){try{return JSON.parse(t.replace(/```json\n?/gi,"").replace(/```\n?/gi,"").trim())}catch{try{const m=t.match(/\{[\s\S]*\}/);if(m)return JSON.parse(m[0])}catch{}return f}}
 async function askAI(system,user,maxTokens=2000){
-  async function askAI(system, user, agent = "parser", maxTokens = 2000) {
+async function askAI(system, user, agent = "parser", maxTokens = 2000) {
   const r = await fetch("/api/groq", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type": "application/json",
+    },
     body: JSON.stringify({
       system,
       user,
       agent,
-      maxTokens
+      maxTokens,
     }),
   });
 
   const d = await r.json();
   if (d.error) throw new Error(d.error);
+
   return d.text || "";
 }
 function loadPDF(){return new Promise((res,rej)=>{if(window.pdfjsLib){res(window.pdfjsLib);return}const s=document.createElement("script");s.src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js";s.onload=()=>{window.pdfjsLib.GlobalWorkerOptions.workerSrc="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";res(window.pdfjsLib)};s.onerror=rej;document.head.appendChild(s)})}
@@ -315,7 +318,12 @@ export default function App(){
     setPage("pipeline");setLogs([]);setAgDone([]);setErr("");setResult(null);
     try{
       setAgActive(1);log("Agent 1 — Parsing resume structure…");
-      const r1=await ("Return ONLY valid JSON (no markdown):","Parse this resume into JSON: {name,contact:{email,phone,location,linkedin},summary,experience:[{company,title,dates,bullets:[]}],education:[{degree,school,year}],skills:[],projects:[],certifications:[]}\n\nResume:\n"+rt,1400);
+     const r1 = await askAI(
+  "Return ONLY valid JSON (no markdown):",
+  "Parse this resume into JSON: {name,contact:{email,phone,location,linkedin},summary,experience:[{company,title,dates,bullets:[]}],education:[{degree,school,year}],skills:[],projects:[],certifications:[]}\n\nResume:\n" + rt,
+  "parser",
+  1400
+);
       const parsed=tryJSON(r1,{name:"Candidate",contact:{},experience:[],education:[],skills:[]});
       setAgDone(p=>[...p,1]);log(`✓ ${parsed.experience?.length??0} roles · ${parsed.skills?.length??0} skills parsed`,"ok");
  
@@ -604,7 +612,11 @@ export default function App(){
                 <Btn outline onClick={()=>setPage("input")}>← Back</Btn>
                 <Btn outline onClick={()=>setJd(sampleJD)} style={{borderColor:`${C.violet}40`,color:`${C.violet}80`,fontSize:9}}>Load Sample JD</Btn>
                 <div style={{flex:1}}/>
-                <Btn onClick={runPipeline} color1={C.violet} color2="#6d28d9" style={{opacity:jd.trim()?1:.3,cursor:jd.trim()?"pointer":"not-allowed"}}>
+                const canRun = rt.trim() && jd.trim();
+
+<Btn onClick={runPipeline}
+  style={{opacity: canRun ? 1 : 0.3, cursor: canRun ? "pointer" : "not-allowed"}}
+/>
                   🚀 Launch AI Pipeline →
                 </Btn>
               </div>

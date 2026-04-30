@@ -9,7 +9,7 @@ const PORT = process.env.PORT || 4000;
 app.use(cors());
 app.use(express.json({ limit: "10mb" }));
 
-// ── Groq API Proxy ──────────────────────────────────────────────────────
+// ── Groq API Proxy (Agent-based models) ────────────────────────────────
 app.post("/api/gemini", async (req, res) => {
   try {
     const apiKey = process.env.GROQ_API_KEY;
@@ -18,7 +18,23 @@ app.post("/api/gemini", async (req, res) => {
       return res.status(500).json({ error: "GROQ_API_KEY not set in environment variables" });
     }
 
-    const { system, user, maxTokens = 2000 } = req.body;
+    let { system, user, maxTokens = 2000, agent } = req.body;
+
+    // 🧠 MODEL MAPPING
+    let model = "llama-3.1-8b-instant"; // default (light)
+
+    if (agent === "content" || agent === "optimizer") {
+      model = "llama-3.3-70b-versatile"; // heavy
+    }
+
+    if (agent === "parser" || agent === "jd" || agent === "scorer") {
+      model = "llama-3.1-8b-instant"; // light
+    }
+
+    // ⚡ Optimize token usage
+    if (agent === "scorer") {
+      maxTokens = 500;
+    }
 
     const response = await fetch(
       "https://api.groq.com/openai/v1/chat/completions",
@@ -29,7 +45,7 @@ app.post("/api/gemini", async (req, res) => {
           Authorization: `Bearer ${apiKey}`,
         },
         body: JSON.stringify({
-          model: "llama-3.3-70b-versatile", // 🔥 best free model
+          model: model,
           messages: [
             {
               role: "system",
@@ -63,7 +79,7 @@ app.post("/api/gemini", async (req, res) => {
   }
 });
 
-// ── Health check ──────────────────────────────────────────────────────────
+// ── Health check ──────────────────────────────────────────────────────
 app.get("/api/health", (_req, res) => {
   res.json({
     status: "ok",
@@ -71,7 +87,7 @@ app.get("/api/health", (_req, res) => {
   });
 });
 
-// ── Serve React build ─────────────────────────────────────────────────────
+// ── Serve React build ─────────────────────────────────────────────────
 const buildPath = path.join(__dirname, "../build");
 app.use(express.static(buildPath));
 
@@ -80,7 +96,7 @@ app.get("*", (_req, res) => {
 });
 
 app.listen(PORT, "0.0.0.0", () => {
-  console.log(`\n🚀 ATS Resume Builder Pro (Groq)`);
+  console.log(`\n🚀 ATS Resume Builder Pro (Groq + Agents)`);
   console.log(`   Port     : ${PORT}`);
   console.log(`   Groq     : ${process.env.GROQ_API_KEY ? "✓ loaded" : "✗ MISSING"}`);
 });

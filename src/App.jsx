@@ -65,7 +65,19 @@ const AGENTS = [
 /* ── Helpers ── */
 function tryJSON(t,f){try{return JSON.parse(t.replace(/```json\n?/gi,"").replace(/```\n?/gi,"").trim())}catch{try{const m=t.match(/\{[\s\S]*\}/);if(m)return JSON.parse(m[0])}catch{}return f}}
 async function askGemini(system,user,maxTokens=2000){
-  const r=await fetch("/api/gemini",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({system,user,maxTokens})});
+  async function askAI(system, user, agent = "parser", maxTokens = 2000) {
+  const r = await fetch("/api/ai", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      system,
+      user,
+      agent,
+      maxTokens
+    })
+  });
   const d=await r.json();
   if(d.error)throw new Error(d.error);
   return d.text||"";

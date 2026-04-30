@@ -64,23 +64,22 @@ const AGENTS = [
  
 /* ── Helpers ── */
 function tryJSON(t,f){try{return JSON.parse(t.replace(/```json\n?/gi,"").replace(/```\n?/gi,"").trim())}catch{try{const m=t.match(/\{[\s\S]*\}/);if(m)return JSON.parse(m[0])}catch{}return f}}
-async function askGemini(system,user,maxTokens=2000){
+async function askAI(system,user,maxTokens=2000){
   async function askAI(system, user, agent = "parser", maxTokens = 2000) {
-  const r = await fetch("/api/ai", {
+  const r = await fetch("/api/groq", {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       system,
       user,
       agent,
       maxTokens
-    })
+    }),
   });
-  const d=await r.json();
-  if(d.error)throw new Error(d.error);
-  return d.text||"";
+
+  const d = await r.json();
+  if (d.error) throw new Error(d.error);
+  return d.text || "";
 }
 function loadPDF(){return new Promise((res,rej)=>{if(window.pdfjsLib){res(window.pdfjsLib);return}const s=document.createElement("script");s.src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js";s.onload=()=>{window.pdfjsLib.GlobalWorkerOptions.workerSrc="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";res(window.pdfjsLib)};s.onerror=rej;document.head.appendChild(s)})}
 async function readPDF(ab){const l=await loadPDF();const p=await l.getDocument({data:ab}).promise;let o="";for(let i=1;i<=p.numPages;i++){const pg=await p.getPage(i);const c=await pg.getTextContent();o+=c.items.map(x=>x.str).join(" ")+"\n"}return o}
@@ -316,31 +315,31 @@ export default function App(){
     setPage("pipeline");setLogs([]);setAgDone([]);setErr("");setResult(null);
     try{
       setAgActive(1);log("Agent 1 — Parsing resume structure…");
-      const r1=await askGemini("Return ONLY valid JSON (no markdown):","Parse this resume into JSON: {name,contact:{email,phone,location,linkedin},summary,experience:[{company,title,dates,bullets:[]}],education:[{degree,school,year}],skills:[],projects:[],certifications:[]}\n\nResume:\n"+rt,1400);
+      const r1=await ("Return ONLY valid JSON (no markdown):","Parse this resume into JSON: {name,contact:{email,phone,location,linkedin},summary,experience:[{company,title,dates,bullets:[]}],education:[{degree,school,year}],skills:[],projects:[],certifications:[]}\n\nResume:\n"+rt,1400);
       const parsed=tryJSON(r1,{name:"Candidate",contact:{},experience:[],education:[],skills:[]});
       setAgDone(p=>[...p,1]);log(`✓ ${parsed.experience?.length??0} roles · ${parsed.skills?.length??0} skills parsed`,"ok");
  
       setAgActive(2);log("Agent 2 — Deep job description analysis…");
-      const r2=await askGemini("Return ONLY valid JSON (no markdown):","Analyse this JD: {keywords:[],requiredSkills:[],niceToHave:[],topPriorities:[],roleLevel,domain,tools:[],softSkills:[],industryTerms:[]}\n\nJD:\n"+jd,1200);
+      const r2=await askAI("Return ONLY valid JSON (no markdown):","Analyse this JD: {keywords:[],requiredSkills:[],niceToHave:[],topPriorities:[],roleLevel,domain,tools:[],softSkills:[],industryTerms:[]}\n\nJD:\n"+jd,1200);
       const jdData=tryJSON(r2,{keywords:[],requiredSkills:[],niceToHave:[],topPriorities:[],tools:[],softSkills:[],industryTerms:[]});
       setAgDone(p=>[...p,2]);log(`✓ ${jdData.keywords?.length??0} keywords · ${jdData.tools?.length??0} tools found`,"ok");
  
       setAgActive(3);log("Agent 3 — Rewriting with world-class content…");
-      const r3=await askGemini(
+      const r3=await askAI(
         "You are a world-class executive resume writer (15+ yrs). COMPLETELY TRANSFORM the resume. Every bullet = strong action verb + quantified result. 4+ bullets per role. Powerful 3-sentence summary. Group skills by category. Return ONLY valid JSON.",
         `JD: ${JSON.stringify(jdData)}\nCandidate: ${JSON.stringify(parsed)}\nReturn: {summary,experience:[{company,title,dates,bullets:[]}],skills:{[category]:[]}}`,3000);
       const gen=tryJSON(r3,{summary:"",experience:parsed.experience||[],skills:{}});
       setAgDone(p=>[...p,3]);log(`✓ ${gen.experience?.reduce((a,e)=>a+(e.bullets?.length??0),0)??0} power bullets crafted`,"ok");
  
       setAgActive(4);log("Agent 4 — Injecting ATS keywords everywhere…");
-      const r4=await askGemini(
+      const r4=await askAI(
         "ATS optimisation expert. Inject keywords into EVERY section naturally. Return ONLY valid JSON.",
         `Keywords: ${[...(jdData.keywords??[]),...(jdData.requiredSkills??[]),...(jdData.tools??[])].join(", ")}\nContent: ${JSON.stringify(gen)}\nReturn: {summary,experience:[{company,title,dates,bullets:[]}],skills:{[category]:[]},keywordsAdded:[],missingSkills:[]}`,2500);
       const ats=tryJSON(r4,{summary:gen.summary,experience:gen.experience,skills:gen.skills,keywordsAdded:[],missingSkills:[]});
       setAgDone(p=>[...p,4]);log(`✓ ${ats.keywordsAdded?.length??0} keywords woven in`,"ok");
  
       setAgActive(5);log("Agent 5 — Calculating ATS score…");
-      const r5=await askGemini(
+      const r5=await askAI(
         "ATS scoring engine. Return ONLY valid JSON.",
         `Resume: ${JSON.stringify(ats)}\nJD: ${JSON.stringify(jdData)}\nReturn: {totalScore,verdict,breakdown:{keywordMatch:{score,max:30,note},contentQuality:{score,max:35,note},formatting:{score,max:20,note},readability:{score,max:15,note}},strengths:[],suggestions:[],quickWins:[],missingSkills:[]}`,1000);
       const score=tryJSON(r5,{totalScore:78,verdict:"Strong",breakdown:{keywordMatch:{score:22,max:30,note:""},contentQuality:{score:27,max:35,note:""},formatting:{score:16,max:20,note:""},readability:{score:13,max:15,note:""}},strengths:[],suggestions:[],quickWins:[],missingSkills:[]});

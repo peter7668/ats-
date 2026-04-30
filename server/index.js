@@ -10,7 +10,7 @@ app.use(cors());
 app.use(express.json({ limit: "10mb" }));
 
 // ── Groq API Proxy (Agent-based models) ────────────────────────────────
-app.post("/api/gemini", async (req, res) => {
+app.post("/api/groq", async (req, res) => {
   try {
     const apiKey = process.env.GROQ_API_KEY;
 

@@ -614,11 +614,17 @@ export default function App(){
                 <div style={{flex:1}}/>
                 const canRun = rt.trim() && jd.trim();
 
-<Btn onClick={runPipeline}
-  style={{opacity: canRun ? 1 : 0.3, cursor: canRun ? "pointer" : "not-allowed"}}
-/>
-                  🚀 Launch AI Pipeline →
-                </Btn>
+<Btn
+  onClick={canRun ? runPipeline : undefined}
+  disabled={!canRun}
+  title={!canRun ? "Please upload resume and paste job description" : ""}
+  style={{
+    opacity: canRun ? 1 : 0.3,
+    cursor: canRun ? "pointer" : "not-allowed"
+  }}
+>
+  🚀 Launch AI Pipeline →
+</Btn>
               </div>
             </GCard>
           </div>

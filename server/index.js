@@ -59,7 +59,7 @@ app.get("/api/health", (_req, res) => {
 });
  
 // ── Serve React build ─────────────────────────────────────────────────────
-const buildPath = path.join(__dirname, "build");
+const buildPath = path.join(__dirname, "../build");
 app.use(express.static(buildPath));
 app.get("*", (_req, res) => {
   res.sendFile(path.join(buildPath, "index.html"));

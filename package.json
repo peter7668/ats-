@@ -1,5 +1,4 @@
 {
-  "groq-sdk": "^0.3.0"
   "name": "ats-resume-builder-pro",
   "version": "3.0.0",
   "private": true,

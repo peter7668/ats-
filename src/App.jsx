@@ -464,31 +464,31 @@ export default function App() {
     setPage("pipeline"); setLogs([]); setAgDone([]); setPipeErr(""); setResult(null);
     try {
       setAgAct(1); log("Agent 1 — Parsing resume…");
-      const r1 = await askGrok("Return ONLY valid JSON. No markdown, no explanation.", `Parse this resume into JSON: {name,contact:{email,phone,location,linkedin},summary,experience:[{company,title,dates,bullets:[]}],education:[{degree,school,year}],skills:[],projects:[],certifications:[]}\n\nResume:\n${rt}`, 1400);
+      const r1 = await askGroq("Return ONLY valid JSON. No markdown, no explanation.", `Parse this resume into JSON: {name,contact:{email,phone,location,linkedin},summary,experience:[{company,title,dates,bullets:[]}],education:[{degree,school,year}],skills:[],projects:[],certifications:[]}\n\nResume:\n${rt}`, 1400);
       const parsed = tryJSON(r1,{name:"Candidate",contact:{},experience:[],education:[],skills:[]});
       setAgDone(p=>[...p,1]); log(`✓ ${parsed.experience?.length??0} roles · ${parsed.skills?.length??0} skills`,"ok");
  
       setAgAct(2); log("Agent 2 — Analysing job description…");
-      const r2 = await askGrok("Return ONLY valid JSON. No markdown.", `Analyse this JD: {keywords:[],requiredSkills:[],niceToHave:[],topPriorities:[],roleLevel,domain,tools:[],softSkills:[],industryTerms:[]}\n\nJD:\n${jd}`, 1200);
+      const r2 = await askGroq("Return ONLY valid JSON. No markdown.", `Analyse this JD: {keywords:[],requiredSkills:[],niceToHave:[],topPriorities:[],roleLevel,domain,tools:[],softSkills:[],industryTerms:[]}\n\nJD:\n${jd}`, 1200);
       const jdData = tryJSON(r2,{keywords:[],requiredSkills:[],niceToHave:[],topPriorities:[],tools:[],softSkills:[],industryTerms:[]});
       setAgDone(p=>[...p,2]); log(`✓ ${jdData.keywords?.length??0} keywords · ${jdData.tools?.length??0} tools`,"ok");
  
       setAgAct(3); log("Agent 3 — Full resume rewrite with elite content…");
-      const r3 = await askGrok(
+      const r3 = await askGroq(
         `You are a world-class executive resume writer with 15+ years experience. Rules: (1) Every bullet starts with a powerful past-tense action verb. (2) Add plausible quantified achievements. (3) Write 4-5 strong bullets per role. (4) Summary must be 3 powerful sentences tailored to the JD. (5) Group skills by category. Return ONLY valid JSON.`,
         `JD: ${JSON.stringify(jdData)}\nCandidate: ${JSON.stringify(parsed)}\nReturn: {summary,experience:[{company,title,dates,bullets:[]}],skills:{[category]:[]}}`, 3500);
       const gen = tryJSON(r3,{summary:"",experience:parsed.experience||[],skills:{}});
       setAgDone(p=>[...p,3]); log(`✓ ${gen.experience?.reduce((a,e)=>a+(e.bullets?.length??0),0)??0} power bullets crafted`,"ok");
  
       setAgAct(4); log("Agent 4 — Injecting ATS keywords everywhere…");
-      const r4 = await askGrok(
+      const r4 = await askGroq(
         "You are an ATS optimisation expert. Inject keywords NATURALLY into every section — bullets, summary AND skills. Do NOT keyword stuff. Return ONLY valid JSON.",
         `Keywords to inject: ${[...(jdData.keywords??[]),...(jdData.requiredSkills??[]),...(jdData.tools??[])].join(", ")}\nResume content: ${JSON.stringify(gen)}\nReturn: {summary,experience:[{company,title,dates,bullets:[]}],skills:{[category]:[]},keywordsAdded:[],missingSkills:[]}`, 2500);
       const ats = tryJSON(r4,{summary:gen.summary,experience:gen.experience,skills:gen.skills,keywordsAdded:[],missingSkills:[]});
       setAgDone(p=>[...p,4]); log(`✓ ${ats.keywordsAdded?.length??0} keywords integrated`,"ok");
  
       setAgAct(5); log("Agent 5 — Calculating ATS score…");
-      const r5 = await askGrok(
+      const r5 = await askGroq(
         "You are an ATS scoring engine. Return ONLY valid JSON.",
         `Resume: ${JSON.stringify(ats)}\nJD: ${JSON.stringify(jdData)}\nReturn: {totalScore,verdict,breakdown:{keywordMatch:{score,max:30,note},contentQuality:{score,max:35,note},formatting:{score,max:20,note},readability:{score,max:15,note}},strengths:[],suggestions:[],quickWins:[],missingSkills:[]}`, 1000);
       const score = tryJSON(r5,{totalScore:79,verdict:"Strong",breakdown:{keywordMatch:{score:23,max:30,note:""},contentQuality:{score:28,max:35,note:""},formatting:{score:16,max:20,note:""},readability:{score:12,max:15,note:""}},strengths:[],suggestions:[],quickWins:[],missingSkills:[]});

@@ -1,6 +1,3 @@
-Atsresumebuilderpro · JSX
-Copy
-
 import { useState, useRef, useEffect, useCallback } from "react";
 import * as mammoth from "mammoth";
  

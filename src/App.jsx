@@ -96,17 +96,25 @@ function tryJSON(t, f) {
   catch { try { const m=t.match(/\{[\s\S]*\}/); if(m) return JSON.parse(m[0]); } catch{} return f; }
 }
  
-async function askGrok(system, user, maxTokens=2000) {
-  const res = await fetch("/api/grok", {
+async function askGroq(system, user, maxTokens = 800) {
+  const res = await fetch("/api/groq", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ system, user, maxTokens }),
   });
+
+  if (!res.ok) {
+    throw new Error(`Server error: ${res.status}`);
+  }
+
   const d = await res.json();
-  if (d.error) throw new Error(d.error);
+
+  if (d.error) {
+    throw new Error(d.error);
+  }
+
   return d.text || "";
 }
- 
 function loadPDFJS() {
   return new Promise((ok,fail) => {
     if (window.pdfjsLib) { ok(window.pdfjsLib); return; }
